@@ -1,0 +1,11 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "email": "admin@healthshare.com",
+      "password": "123456",
+      "fullName": "Admin User",
+      "createdAt": "2025-06-07T12:00:00Z"
+    }
+  ]
+}
