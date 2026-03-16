@@ -7,34 +7,40 @@ interface BMIChartProps {
   bmiValue: number;
 }
 
+/**
+ * Thành phần hiển thị biểu đồ chỉ số BMI trực quan
+ * Giúp người dùng dễ dàng nhận biết trạng thái cân nặng của mình
+ */
 const BMIChart: React.FC<BMIChartProps> = ({ bmiValue }) => {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   
-  // Calculate position on the chart (0-100%)
+  // Tính toán vị trí của điểm đánh dấu trên biểu đồ (từ 0% đến 100%)
+  // Giả định dải chỉ số BMI từ 15 đến 30 để hiển thị trực quan
   const position = Math.min(100, Math.max(0, ((bmiValue - 15) / 15) * 100));
   
-  // Determine category color
+  // Xác định màu sắc và nội dung phân loại dựa trên chỉ số BMI
   let categoryColor = "";
   let categoryText = "";
   
   if (bmiValue < 18.5) {
-    categoryColor = "#64D2FF"; // Light blue for underweight
+    categoryColor = "#64D2FF"; // Màu xanh dương nhạt cho thiếu cân
     categoryText = "Thiếu cân";
   } else if (bmiValue >= 18.5 && bmiValue < 23) {
-    categoryColor = "#34C759"; // Green for normal
+    categoryColor = "#34C759"; // Màu xanh lá cho bình thường
     categoryText = "Bình thường";
   } else if (bmiValue >= 23 && bmiValue < 25) {
-    categoryColor = "#FFCC00"; // Yellow for overweight
+    categoryColor = "#FFCC00"; // Màu vàng cho thừa cân
     categoryText = "Thừa cân";
   } else {
-    categoryColor = "#FF3B30"; // Red for obese
+    categoryColor = "#FF3B30"; // Màu đỏ cho béo phì
     categoryText = "Béo phì";
   }
   
   return (
     <View style={styles.container}>
       <View style={styles.chartContainer}>
+        {/* Phần thân biểu đồ với 4 phân đoạn màu sắc */}
         <View style={styles.categories}>
           <View style={[styles.category, { backgroundColor: "#64D2FF" }]} />
           <View style={[styles.category, { backgroundColor: "#34C759" }]} />
@@ -42,6 +48,7 @@ const BMIChart: React.FC<BMIChartProps> = ({ bmiValue }) => {
           <View style={[styles.category, { backgroundColor: "#FF3B30" }]} />
         </View>
         
+        {/* Các nhãn chỉ số BMI tương ứng bên dưới biểu đồ */}
         <View style={styles.labels}>
           <Text style={[styles.label, { color: colors.text }]}>15</Text>
           <Text style={[styles.label, { color: colors.text }]}>18.5</Text>
@@ -50,6 +57,7 @@ const BMIChart: React.FC<BMIChartProps> = ({ bmiValue }) => {
           <Text style={[styles.label, { color: colors.text }]}>30</Text>
         </View>
         
+        {/* Điểm đánh dấu (marker) hiển thị vị trí BMI hiện tại */}
         <View style={styles.markerContainer}>
           <View 
             style={[
@@ -63,6 +71,7 @@ const BMIChart: React.FC<BMIChartProps> = ({ bmiValue }) => {
         </View>
       </View>
       
+      {/* Hiển thị giá trị số và văn bản phân loại */}
       <View style={styles.resultContainer}>
         <Text style={[styles.bmiValue, { color: colors.text }]}>
           {bmiValue.toFixed(1)}
@@ -130,4 +139,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BMIChart;
+export default BMIChart;
