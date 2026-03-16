@@ -1,13 +1,19 @@
 /**
- * Returns the current date in a formatted string
- * @returns {string} Formatted date string (e.g., "Monday, January 1")
+ * Trả về ngày hiện tại dưới dạng chuỗi đã định dạng
+ * @returns {string} Chuỗi ngày đã định dạng (ví dụ: "Thứ Hai, ngày 1 tháng 1")
  */
 import dayjs from 'dayjs'
 import 'dayjs/locale/vi' // Import ngôn ngữ tiếng Việt
 import relativeTime from 'dayjs/plugin/relativeTime'
 
+// Cấu hình dayjs để hỗ trợ thời gian tương đối và ngôn ngữ Tiếng Việt
 dayjs.extend(relativeTime)
 dayjs.locale('vi')
+
+/**
+ * Lấy ngày hiện tại và định dạng theo chuẩn Tiếng Việt
+ * @returns {string} Chuỗi ngày (ví dụ: "thứ hai, 1 tháng 1")
+ */
 export const getCurrentDate = (): string => {
     const date = new Date();
     return date.toLocaleDateString('vi', {
@@ -18,9 +24,9 @@ export const getCurrentDate = (): string => {
   };
   
   /**
-   * Formats a timestamp to a readable time string
-   * @param {number} timestamp - The timestamp to format
-   * @returns {string} Formatted time string (e.g., "9:30 AM")
+   * Định dạng dấu thời gian thành chuỗi giờ dễ đọc
+   * @param {number} timestamp - Dấu thời gian cần định dạng
+   * @returns {string} Chuỗi giờ đã định dạng (ví dụ: "9:30 SA")
    */
   export const formatTime = (timestamp: number): string => {
     const date = new Date(timestamp);
@@ -32,10 +38,10 @@ export const getCurrentDate = (): string => {
   };
   
   /**
-   * Checks if two dates are the same day
-   * @param {Date} date1 - First date to compare
-   * @param {Date} date2 - Second date to compare
-   * @returns {boolean} True if dates are the same day
+   * Kiểm tra xem hai ngày có cùng một ngày hay không
+   * @param {Date} date1 - Ngày thứ nhất để so sánh
+   * @param {Date} date2 - Ngày thứ hai để so sánh
+   * @returns {boolean} True nếu hai ngày giống nhau
    */
   export const isSameDay = (date1: Date, date2: Date): boolean => {
     return (
@@ -46,8 +52,8 @@ export const getCurrentDate = (): string => {
   };
   
   /**
-   * Returns the start of the current day
-   * @returns {Date} Date object set to the start of the current day
+   * Trả về thời điểm bắt đầu của ngày hiện tại (00:00:00)
+   * @returns {Date} Đối tượng Date được thiết lập vào đầu ngày hiện tại
    */
   export const startOfToday = (): Date => {
     const today = new Date();
@@ -56,9 +62,10 @@ export const getCurrentDate = (): string => {
   };
   
   /**
-   * Formats a date for display in logs
-   * @param {number} timestamp - The timestamp to format
-   * @returns {string} Formatted date string (e.g., "Today, 9:30 AM" or "Yesterday, 9:30 PM")
+   * Định dạng ngày để hiển thị trong nhật ký (logs)
+   * Sử dụng các từ khóa "Hôm nay", "Hôm qua" nếu phù hợp
+   * @param {number} timestamp - Dấu thời gian cần định dạng
+   * @returns {string} Chuỗi ngày đã định dạng (ví dụ: "Hôm nay, 9:30 SA")
    */
   export const formatLogDate = (timestamp: number): string => {
     const date = new Date(timestamp);
@@ -66,14 +73,16 @@ export const getCurrentDate = (): string => {
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
     
+    // Kiểm tra xem là hôm nay hay hôm qua để hiển thị nhãn thân thiện
     if (isSameDay(date, today)) {
       return `Hôm nay, ${formatTime(timestamp)}`;
     } else if (isSameDay(date, yesterday)) {
       return `Hôm qua, ${formatTime(timestamp)}`;
     } else {
+      // Định dạng ngày thông thường nếu không phải hôm nay/hôm qua
       return `${date.toLocaleDateString('vi', {
         month: 'short',
         day: 'numeric',
       })}, ${formatTime(timestamp)}`;
     }
-  };
+  };
