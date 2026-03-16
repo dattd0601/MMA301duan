@@ -1,8 +1,8 @@
 /**
- * Calculates BMI based on height and weight
- * @param {number} weight - Weight in kg
- * @param {number} height - Height in cm
- * @returns {number} BMI value
+ * Tính toán chỉ số BMI dựa trên cân nặng và chiều cao
+ * @param {number} weight - Cân nặng tính bằng kg
+ * @param {number} height - Chiều cao tính bằng cm
+ * @returns {number} Giá trị BMI
  */
 export const calculateBMI = (weight: number, height: number): number => {
     const heightInMeters = height / 100;
@@ -10,9 +10,9 @@ export const calculateBMI = (weight: number, height: number): number => {
   };
   
   /**
-   * Gets BMI category based on BMI value
-   * @param {number} bmi - BMI value
-   * @returns {string} BMI category
+   * Phân loại chỉ số BMI theo các ngưỡng chuẩn
+   * @param {number} bmi - Giá trị BMI cần phân loại
+   * @returns {string} Phân loại BMI (thiếu cân, bình thường, thừa cân, béo phì)
    */
   export const getBMICategory = (bmi: number): string => {
     if (bmi < 18.5) return "underweight";
@@ -22,14 +22,15 @@ export const calculateBMI = (weight: number, height: number): number => {
   };
   
   /**
-   * Calculates daily calorie needs
-   * @param {number} weight - Weight in kg
-   * @param {number} height - Height in cm
-   * @param {number} age - Age in years
-   * @param {string} gender - "male" or "female"
-   * @param {string} activityLevel - Activity level
-   * @param {string} goal - Weight goal
-   * @returns {number} Daily calorie needs
+   * Tính toán nhu cầu calo hàng ngày (TDEE)
+   * Sử dụng phương trình Mifflin-St Jeor để tính BMR
+   * @param {number} weight - Cân nặng tính bằng kg
+   * @param {number} height - Chiều cao tính bằng cm
+   * @param {number} age - Tuổi tính theo năm
+   * @param {string} gender - Giới tính ("male" hoặc "female")
+   * @param {string} activityLevel - Mức độ hoạt động (sedentary, light, moderate, active, very_active)
+   * @param {string} goal - Mục tiêu cân nặng (lose, maintain, gain)
+   * @returns {number} Nhu cầu calo hàng ngày đã làm tròn
    */
   export const calculateDailyCalories = (
     weight: number,
@@ -39,7 +40,7 @@ export const calculateBMI = (weight: number, height: number): number => {
     activityLevel: string,
     goal: string
   ): number => {
-    // Calculate BMR using Mifflin-St Jeor Equation
+    // Tính toán Tỉ lệ trao đổi chất cơ bản (BMR)
     let bmr = 0;
     if (gender === "male") {
       bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
@@ -47,8 +48,8 @@ export const calculateBMI = (weight: number, height: number): number => {
       bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161;
     }
     
-    // Apply activity multiplier
-    let activityMultiplier = 1.2; // sedentary
+    // Áp dụng hệ số vận động
+    let activityMultiplier = 1.2; // Ít vận động
     switch (activityLevel) {
       case "light":
         activityMultiplier = 1.375;
@@ -66,64 +67,65 @@ export const calculateBMI = (weight: number, height: number): number => {
     
     let dailyCalories = bmr * activityMultiplier;
     
-    // Adjust based on goal
+    // Điều chỉnh calo dựa trên mục tiêu
     if (goal === "lose") {
-      dailyCalories -= 500; // Deficit for weight loss
+      dailyCalories -= 500; // Thâm hụt calo để giảm cân
     } else if (goal === "gain") {
-      dailyCalories += 500; // Surplus for weight gain
+      dailyCalories += 500; // Dư thừa calo để tăng cân
     }
     
     return Math.round(dailyCalories);
   };
   
   /**
-   * Calculates recommended water intake
-   * @param {number} weight - Weight in kg
-   * @param {string} activityLevel - Activity level
-   * @returns {number} Recommended water intake in ml
+   * Tính toán lượng nước khuyến nghị hàng ngày
+   * @param {number} weight - Cân nặng tính bằng kg
+   * @param {string} activityLevel - Mức độ hoạt động
+   * @returns {number} Lượng nước khuyến nghị tính bằng ml
    */
   export const calculateWaterIntake = (weight: number, activityLevel: string): number => {
-    // Base calculation: 30ml per kg of body weight
+    // Công thức cơ bản: 30ml trên mỗi kg trọng lượng cơ thể
     let waterIntake = weight * 30;
     
-    // Adjust based on activity level
+    // Điều chỉnh dựa trên mức độ hoạt động thể chất
     if (activityLevel === "active" || activityLevel === "very_active") {
-      waterIntake *= 1.2; // 20% more for active individuals
+      waterIntake *= 1.2; // Tăng thêm 20% cho người năng động
     }
     
     return Math.round(waterIntake);
   };
   
   /**
-   * Calculates macronutrient distribution
-   * @param {number} calories - Total daily calories
-   * @param {string} goal - Weight goal
-   * @returns {Object} Macronutrient distribution in grams
+   * Tính toán phân bổ các chất dinh dưỡng đa lượng (Macronutrients)
+   * @param {number} calories - Tổng số calo hàng ngày
+   * @param {string} goal - Mục tiêu cân nặng
+   * @returns {Object} Phân bổ chất dinh dưỡng (Protein, Carbs, Fat) tính bằng gram
    */
   export const calculateMacros = (calories: number, goal: string) => {
+    // Tỷ lệ phần trăm mặc định (Duy trì)
     let proteinPercentage = 0.3; // 30%
     let fatPercentage = 0.25; // 25%
     let carbsPercentage = 0.45; // 45%
     
-    // Adjust macros based on goal
+    // Điều chỉnh tỷ lệ dựa trên mục tiêu
     if (goal === "gain") {
-      proteinPercentage = 0.25; // 25%
-      carbsPercentage = 0.5; // 50%
-      fatPercentage = 0.25; // 25%
+      proteinPercentage = 0.25;
+      carbsPercentage = 0.5;
+      fatPercentage = 0.25;
     } else if (goal === "lose") {
-      proteinPercentage = 0.35; // 35%
-      carbsPercentage = 0.4; // 40%
-      fatPercentage = 0.25; // 25%
+      proteinPercentage = 0.35;
+      carbsPercentage = 0.4;
+      fatPercentage = 0.25;
     }
     
-    // Calculate grams
-    const proteinGrams = Math.round((calories * proteinPercentage) / 4); // 4 calories per gram
-    const carbsGrams = Math.round((calories * carbsPercentage) / 4); // 4 calories per gram
-    const fatGrams = Math.round((calories * fatPercentage) / 9); // 9 calories per gram
+    // Tính toán số gram (Protein/Carbs: 4 cal/g, Fat: 9 cal/g)
+    const proteinGrams = Math.round((calories * proteinPercentage) / 4);
+    const carbsGrams = Math.round((calories * carbsPercentage) / 4);
+    const fatGrams = Math.round((calories * fatPercentage) / 9);
     
     return {
       protein: proteinGrams,
       carbs: carbsGrams,
       fat: fatGrams,
     };
-  };
+  };
