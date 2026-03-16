@@ -8,10 +8,10 @@ export default {
     tint: tintColorLight,
     tabIconDefault: "#CCCCCC",
     tabIconSelected: tintColorLight,
-    card: "#1F1F1F", // nen chínhchính
+    card: "#1F1F1F", // Nền chính
     border: "#E5E5E5",
     notification: "#FF3B30",
-    primary: "#0C760C", // sellect
+    primary: "#0C760C", // Màu được chọn (select)
     secondary: "#4A2800",
     success: "#34C759",
     warning: "#FFCC00",
