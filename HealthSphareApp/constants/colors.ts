@@ -1,6 +1,10 @@
 const tintColorLight = "#3DC485";
 const tintColorDark = "#22A885";
 
+/**
+ * HealthSphare App Color Palette
+ * Defines semantic color tokens for both light and dark themes.
+ */
 export default {
   light: {
     text: "#FFFFFF",
