@@ -22,6 +22,8 @@ export default {
     food: "#FFCC00",
     exercise: "#FF9500",
     premium: "#AF52DE",
+    info: "#34C759", // Màu thông tin phụ
+    inactive: "#A1A1AA", // Màu vô hiệu hóa
   },
   dark: {
     text: "#FFFFFF",
@@ -43,5 +45,7 @@ export default {
     food: "#FFD60A",
     exercise: "#FF9F0A",
     premium: "#BF5AF2",
+    info: "#30D158", // Màu thông tin phụ (tương phản tối)
+    inactive: "#52525B", // Màu vô hiệu hóa (tương phản tối)
   },
 };
