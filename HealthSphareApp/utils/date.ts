@@ -60,6 +60,29 @@ export const getCurrentDate = (): string => {
     today.setHours(0, 0, 0, 0);
     return today;
   };
+
+  /**
+   * Trả về thời điểm kết thúc của ngày hiện tại (23:59:59.999)
+   * @returns {Date} Đối tượng Date được thiết lập vào cuối ngày hiện tại
+   */
+  export const endOfToday = (): Date => {
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+    return today;
+  };
+
+  /**
+   * Trả về ngày đầu tiên của tuần hiện tại (Thứ Hai)
+   * @returns {Date} Đối tượng Date được thiết lập vào đầu tuần hiện tại
+   */
+  export const getStartOfWeek = (): Date => {
+    const today = new Date();
+    const day = today.getDay(); // 0 is Sunday, 1 is Monday...
+    const diff = today.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
+    const startOfWeek = new Date(today.setDate(diff));
+    startOfWeek.setHours(0, 0, 0, 0);
+    return startOfWeek;
+  };
   
   /**
    * Định dạng ngày để hiển thị trong nhật ký (logs)
