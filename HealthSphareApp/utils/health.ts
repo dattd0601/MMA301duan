@@ -137,4 +137,22 @@ export const calculateBMI = (weight: number, height: number): number => {
       carbs: carbsGrams,
       fat: fatGrams,
     };
-  };
+  };
+
+  /**
+   * Tính toán cân nặng lý tưởng (Ideal Body Weight - IBW)
+   * Sử dụng công thức Devine
+   * @param {number} height - Chiều cao tính bằng cm
+   * @param {string} gender - Giới tính ("male" hoặc "female")
+   * @returns {number} Cân nặng lý tưởng tính bằng kg
+   */
+  export const calculateIdealBodyWeight = (height: number, gender: string): number => {
+    const heightInInches = height / 2.54;
+    const inchesOver5Feet = Math.max(0, heightInInches - 60);
+    
+    if (gender === "male") {
+      return Math.round(50 + 2.3 * inchesOver5Feet);
+    } else {
+      return Math.round(45.5 + 2.3 * inchesOver5Feet);
+    }
+  };
