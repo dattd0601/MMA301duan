@@ -20,22 +20,16 @@ const BMIChart: React.FC<BMIChartProps> = ({ bmiValue }) => {
   const position = Math.min(100, Math.max(0, ((bmiValue - 15) / 15) * 100));
   
   // Xác định màu sắc và nội dung phân loại dựa trên chỉ số BMI
-  let categoryColor = "";
-  let categoryText = "";
-  
-  if (bmiValue < 18.5) {
-    categoryColor = "#64D2FF"; // Màu xanh dương nhạt cho thiếu cân
-    categoryText = "Thiếu cân";
-  } else if (bmiValue >= 18.5 && bmiValue < 23) {
-    categoryColor = "#34C759"; // Màu xanh lá cho bình thường
-    categoryText = "Bình thường";
-  } else if (bmiValue >= 23 && bmiValue < 25) {
-    categoryColor = "#FFCC00"; // Màu vàng cho thừa cân
-    categoryText = "Thừa cân";
-  } else {
-    categoryColor = "#FF3B30"; // Màu đỏ cho béo phì
-    categoryText = "Béo phì";
-  }
+  const bmiCategories = [
+    { max: 18.5, color: "#64D2FF", text: "Thiếu cân" },
+    { max: 23, color: "#34C759", text: "Bình thường" },
+    { max: 25, color: "#FFCC00", text: "Thừa cân" },
+    { max: Infinity, color: "#FF3B30", text: "Béo phì" },
+  ];
+
+  const category = bmiCategories.find(c => bmiValue < c.max) || bmiCategories[3];
+  const categoryColor = category.color;
+  const categoryText = category.text;
   
   return (
     <View style={styles.container}>
