@@ -1,4 +1,13 @@
 /**
+ * BMI Thresholds according to various health standards
+ */
+export const BMI_THRESHOLDS = {
+  UNDERWEIGHT: 18.5,
+  NORMAL_MAX: 23,
+  OVERWEIGHT_MAX: 25,
+};
+
+/**
  * Tính toán chỉ số BMI dựa trên cân nặng và chiều cao
  * @param {number} weight - Cân nặng tính bằng kg
  * @param {number} height - Chiều cao tính bằng cm
@@ -15,9 +24,9 @@ export const calculateBMI = (weight: number, height: number): number => {
    * @returns {string} Phân loại BMI (thiếu cân, bình thường, thừa cân, béo phì)
    */
   export const getBMICategory = (bmi: number): string => {
-    if (bmi < 18.5) return "underweight";
-    if (bmi >= 18.5 && bmi < 23) return "normal";
-    if (bmi >= 23 && bmi < 25) return "overweight";
+    if (bmi < BMI_THRESHOLDS.UNDERWEIGHT) return "underweight";
+    if (bmi >= BMI_THRESHOLDS.UNDERWEIGHT && bmi < BMI_THRESHOLDS.NORMAL_MAX) return "normal";
+    if (bmi >= BMI_THRESHOLDS.NORMAL_MAX && bmi < BMI_THRESHOLDS.OVERWEIGHT_MAX) return "overweight";
     return "obese";
   };
   
