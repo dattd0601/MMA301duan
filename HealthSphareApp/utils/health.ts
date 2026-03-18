@@ -7,6 +7,15 @@ export const BMI_THRESHOLDS = {
   OVERWEIGHT_MAX: 25,
 };
 
+export interface HealthInputs {
+  weight: number;
+  height: number;
+  age: number;
+  gender: "male" | "female";
+  activityLevel: string;
+  goal: string;
+}
+
 /**
  * Tính toán chỉ số BMI dựa trên cân nặng và chiều cao
  * @param {number} weight - Cân nặng tính bằng kg
@@ -31,13 +40,51 @@ export const calculateBMI = (weight: number, height: number): number => {
   };
   
   /**
+   * Tính toán Tỉ lệ trao đổi chất cơ bản (BMR)
+   * Sử dụng phương trình Mifflin-St Jeor
+   * @param {number} weight - Cân nặng (kg)
+   * @param {number} height - Chiều cao (cm)
+   * @param {number} age - Tuổi
+   * @param {string} gender - Giới tính ("male" hoặc "female")
+   * @returns {number} Giá trị BMR
+   */
+  export const calculateBMR = (
+    weight: number,
+    height: number,
+    age: number,
+    gender: string
+  ): number => {
+    if (gender === "male") {
+      return (10 * weight) + (6.25 * height) - (5 * age) + 5;
+    } else {
+      return (10 * weight) + (6.25 * height) - (5 * age) - 161;
+    }
+  };
+
+  /**
+   * Ước tính phần trăm mỡ cơ thể (Body Fat Percentage)
+   * Sử dụng công thức dựa trên BMI
+   * @param {number} bmi - Chỉ số BMI
+   * @param {number} age - Tuổi
+   * @param {Gender} gender - Giới tính ("male" hoặc "female")
+   * @returns {number} Phần trăm mỡ cơ thể ước tính
+   */
+  export const calculateBodyFatPercentage = (
+    bmi: number,
+    age: number,
+    gender: string
+  ): number => {
+    const genderValue = gender === "male" ? 1 : 0;
+    // Công thức trưởng thành: (1.20 × BMI) + (0.23 × Age) − (10.8 × gender) − 5.4
+    const bodyFat = (1.20 * bmi) + (0.23 * age) - (10.8 * genderValue) - 5.4;
+    return Math.round(bodyFat * 10) / 10;
+  };
+
+  /**
    * Tính toán nhu cầu calo hàng ngày (TDEE)
-   * Sử dụng phương trình Mifflin-St Jeor để tính BMR
    * @param {number} weight - Cân nặng tính bằng kg
    * @param {number} height - Chiều cao tính bằng cm
    * @param {number} age - Tuổi tính theo năm
-   * @param {string} gender - Giới tính ("male" hoặc "female")
-   * @param {string} activityLevel - Mức độ hoạt động (sedentary, light, moderate, active, very_active)
    * @param {string} goal - Mục tiêu cân nặng (lose, maintain, gain)
    * @returns {number} Nhu cầu calo hàng ngày đã làm tròn
    */
@@ -45,17 +92,12 @@ export const calculateBMI = (weight: number, height: number): number => {
     weight: number,
     height: number,
     age: number,
-    gender: string,
+    gender: "male" | "female",
     activityLevel: string,
     goal: string
   ): number => {
     // Tính toán Tỉ lệ trao đổi chất cơ bản (BMR)
-    let bmr = 0;
-    if (gender === "male") {
-      bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
-    } else {
-      bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161;
-    }
+    const bmr = calculateBMR(weight, height, age, gender);
     
     // Áp dụng hệ số vận động
     let activityMultiplier = 1.2; // Ít vận động
