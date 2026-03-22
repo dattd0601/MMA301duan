@@ -10,6 +10,8 @@ import {
 } from 'react-native';
 import { authStore } from '../store/authStore';
 import { RegisterData } from '../types/user';
+import { useColorScheme } from '../hooks/useColorScheme';
+import Colors from '../constants/colors';
 
 interface RegisterFormProps {
   onRegisterSuccess: () => void;
@@ -20,6 +22,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   onRegisterSuccess, 
   onSwitchToLogin 
 }) => {
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme];
   const [formData, setFormData] = useState<RegisterData>({
     email: '',
     password: '',
@@ -61,15 +65,17 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       <Text style={styles.title}>Đăng Ký</Text>
       
       <TextInput
-        style={styles.input}
+        style={[styles.input, { color: '#333' }]}
         placeholder="Họ và tên"
+        placeholderTextColor="#999"
         value={formData.fullName}
         onChangeText={(text) => setFormData({...formData, fullName: text})}
       />
       
       <TextInput
-        style={styles.input}
+        style={[styles.input, { color: '#333' }]}
         placeholder="Email"
+        placeholderTextColor="#999"
         value={formData.email}
         onChangeText={(text) => setFormData({...formData, email: text})}
         keyboardType="email-address"
@@ -77,16 +83,18 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       />
       
       <TextInput
-        style={styles.input}
+        style={[styles.input, { color: '#333' }]}
         placeholder="Mật khẩu"
+        placeholderTextColor="#999"
         value={formData.password}
         onChangeText={(text) => setFormData({...formData, password: text})}
         secureTextEntry
       />
       
       <TextInput
-        style={styles.input}
+        style={[styles.input, { color: '#333' }]}
         placeholder="Xác nhận mật khẩu"
+        placeholderTextColor="#999"
         value={formData.confirmPassword}
         onChangeText={(text) => setFormData({...formData, confirmPassword: text})}
         secureTextEntry

@@ -28,7 +28,11 @@ export default function FoodScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
-  const [totalCalories, setTotalCalories] = useState(0);
+  const [selectedFoods, setSelectedFoods] = useState<FoodItem[]>([]);
+
+  const totalCalories = useMemo(() => {
+    return selectedFoods.reduce((sum, f) => sum + f.calories, 0);
+  }, [selectedFoods]);
 
   const filteredFoods = useMemo(() => {
     return vietnameseFoods.filter((food) => {
@@ -63,18 +67,34 @@ export default function FoodScreen() {
     { id: "weightLoss", label: "Giảm cân" },
     { id: "weightGain", label: "Tăng cân" },
   ];
+  
   const handleSelectFood = (food: FoodItem) => {
-    const newTotal = totalCalories + food.calories;
-    if (newTotal > dailyCalories) {
-      alert("Bạn đã vượt quá mức calories cho phép trong ngày!");
+    const isAlreadySelected = selectedFoods.some(f => f.id === food.id);
+    
+    if (isAlreadySelected) {
+      // Bỏ chọn món ăn
+      setSelectedFoods(selectedFoods.filter(f => f.id !== food.id));
+    } else {
+      // Thêm món ăn
+      const newTotal = totalCalories + food.calories;
+      if (newTotal > dailyCalories) {
+        alert("Bạn đã vượt quá mức calories cho phép trong ngày!");
+      }
+      setSelectedFoods([...selectedFoods, food]);
     }
-    setTotalCalories(newTotal);
   };
 
 
-  const renderFoodItem = ({ item }: { item: FoodItem }) => (
-    <FoodCard food={item} onPress={() => handleSelectFood(item)} />
-  );
+  const renderFoodItem = ({ item }: { item: FoodItem }) => {
+    const isSelected = selectedFoods.some(f => f.id === item.id);
+    return (
+      <FoodCard 
+        food={item} 
+        onPress={() => handleSelectFood(item)} 
+        isSelected={isSelected}
+      />
+    );
+  };
 
 
   // const renderFoodItem = ({ item }: { item: FoodItem }) => (

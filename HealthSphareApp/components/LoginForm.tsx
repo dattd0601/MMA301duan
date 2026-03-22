@@ -10,6 +10,8 @@ import {
 } from 'react-native';
 import { authStore } from '../store/authStore';
 import { LoginCredentials } from '../types/user';
+import { useColorScheme } from '../hooks/useColorScheme';
+import Colors from '../constants/colors';
 
 interface LoginFormProps {
   onLoginSuccess: () => void;
@@ -20,6 +22,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   onLoginSuccess, 
   onSwitchToRegister 
 }) => {
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme];
   const [credentials, setCredentials] = useState<LoginCredentials>({
     email: '',
     password: ''
@@ -54,8 +58,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       <Text style={styles.title}>Đăng Nhập</Text>
       
       <TextInput
-        style={styles.input}
+        style={[styles.input, { color: '#333' }]}
         placeholder="Email"
+        placeholderTextColor="#999"
         value={credentials.email}
         onChangeText={(text) => setCredentials({...credentials, email: text})}
         keyboardType="email-address"
@@ -63,8 +68,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       />
       
       <TextInput
-        style={styles.input}
+        style={[styles.input, { color: '#333' }]}
         placeholder="Mật khẩu"
+        placeholderTextColor="#999"
         value={credentials.password}
         onChangeText={(text) => setCredentials({...credentials, password: text})}
         secureTextEntry

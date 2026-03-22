@@ -8,18 +8,31 @@ import { FoodItem } from "../mocks/vietnameseFoods";
 interface FoodCardProps {
   food: FoodItem;
   onPress?: () => void;
+  isSelected?: boolean;
 }
 
-const FoodCard: React.FC<FoodCardProps> = ({ food, onPress }) => {
+const FoodCard: React.FC<FoodCardProps> = ({ food, onPress, isSelected }) => {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   
   return (
     <TouchableOpacity 
-      style={[styles.container, { backgroundColor: colors.card }]}
+      style={[
+        styles.container, 
+        { 
+          backgroundColor: colors.card,
+          borderColor: isSelected ? colors.primary : "transparent",
+          borderWidth: isSelected ? 2 : 0,
+        }
+      ]}
       onPress={onPress}
       activeOpacity={0.7}
     >
+      {isSelected && (
+        <View style={[styles.selectedIndicator, { backgroundColor: colors.primary }]}>
+          <Text style={styles.selectedIndicatorText}>✓</Text>
+        </View>
+      )}
       {/* Ảnh được bọc trong wrapper để cố định kích thước */}
       <View style={styles.imageWrapper}>
         <Image 
@@ -144,6 +157,24 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 12,
     fontWeight: "600",
+  },
+  selectedIndicator: {
+    position: "absolute",
+    top: 8,
+    left: 8,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 10,
+    borderWidth: 1,
+    borderColor: "white",
+  },
+  selectedIndicatorText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "bold",
   },
 });
 

@@ -8,33 +8,41 @@ export default function Index() {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    const checkProfile = async () => {
-      const profile = await AsyncStorage.getItem('health-app-storage');
+    const checkStatus = async () => {
+      try {
+        // Kiểm tra trạng thái đăng nhập
+        const user = await authStore.checkAuthStatus();
+        
+        // Kiểm tra dữ liệu Profile từ UserStore (lưu trong AsyncStorage)
+        const storageData = await AsyncStorage.getItem('health-app-storage');
+        let hasOnboarding = false;
+        
+        if (storageData) {
+          const parsedData = JSON.parse(storageData);
+          hasOnboarding = parsedData.state?.hasCompletedOnboarding || false;
+        }
 
-      const user = await authStore.checkAuthStatus();
-
-      // Delay để layout chắc chắn đã mount
-      setTimeout(() => {
-
-
-        if (!profile) {
+        // Delay ngắn để splash screen hiển thị mượt mà
+        setTimeout(() => {
           if (!user) {
+            // Chưa đăng nhập -> Đi tới màn Auth
             router.replace('/auth');
-          } else {
+          } else if (!hasOnboarding) {
+            // Đã đăng nhập nhưng chưa Onboarding -> Đi tới Onboarding
             router.replace('/onboarding');
-          }
-        } else {
-          if (!user) {
-            router.replace('/auth');
           } else {
+            // Đã xong hết -> Vào Main App
             router.replace('/(tabs)');
           }
-        }
-        setChecking(false);
-      }, 200);
+          setChecking(false);
+        }, 500);
+      } catch (error) {
+        console.error('Check status error:', error);
+        router.replace('/auth');
+      }
     };
 
-    checkProfile();
+    checkStatus();
   }, []);
 
   //   if (checking) {

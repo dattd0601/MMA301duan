@@ -54,8 +54,10 @@ function RootLayoutNav() {
     return (
       <>
         <StatusBar style="auto" />
-        <Stack>
-          <Stack.Screen name="food" options={{ headerShown: false }} />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="index" />
+          <Stack.Screen name="auth" />
+          <Stack.Screen name="onboarding" />
         </Stack>
       </>
     );
