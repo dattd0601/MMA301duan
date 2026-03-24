@@ -1,67 +1,43 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User, LoginCredentials, RegisterData, AuthResponse } from '../types/user';
-import usersData from '../mocks/users.json';
+import { useUserStore } from './userStore';
+
+const API_URL = 'http://192.168.3.250:5005/api/users';
 
 class AuthStore {
-  private users: User[] = usersData.users;
   private currentUser: Omit<User, 'password'> | null = null;
-
-  // Load users từ AsyncStorage khi khởi động
-  async loadUsers(): Promise<void> {
-    try {
-      const storedUsers = await AsyncStorage.getItem('healthshare_users');
-      if (storedUsers) {
-        this.users = JSON.parse(storedUsers);
-      }
-    } catch (error) {
-      console.error('Error loading users:', error);
-    }
-  }
-
-  // Save users vào AsyncStorage
-  private async saveUsers(): Promise<void> {
-    try {
-      await AsyncStorage.setItem('healthshare_users', JSON.stringify(this.users));
-    } catch (error) {
-      console.error('Error saving users:', error);
-    }
-  }
 
   // Đăng ký tài khoản mới
   async register(userData: RegisterData): Promise<AuthResponse> {
     try {
-      // Kiểm tra email đã tồn tại
-      const existingUser = this.users.find(user => user.email === userData.email);
-      if (existingUser) {
-        return {
-          success: false,
-          message: 'Email đã được sử dụng'
-        };
-      }
-
-      // Kiểm tra mật khẩu xác nhận
       if (userData.password !== userData.confirmPassword) {
-        return {
-          success: false,
-          message: 'Mật khẩu xác nhận không khớp'
-        };
+        return { success: false, message: 'Mật khẩu xác nhận không khớp' };
       }
 
-      // Tạo user mới
-      const newUser: User = {
-        id: this.users.length + 1,
-        email: userData.email,
-        password: userData.password,
-        fullName: userData.fullName,
-        createdAt: new Date().toISOString()
-      };
+      const response = await fetch(`${API_URL}/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: userData.email,
+          password: userData.password,
+          fullName: userData.fullName
+        }),
+      });
 
-      this.users.push(newUser);
-      await this.saveUsers();
+      const data = await response.json();
 
-      // Trả về thông tin user (không bao gồm password)
-      const { password, ...userWithoutPassword } = newUser;
+      if (!response.ok) {
+        return { success: false, message: data.message || 'Đã xảy ra lỗi khi đăng ký' };
+      }
+
+      const { password, ...userWithoutPassword } = data.user;
       this.currentUser = userWithoutPassword;
+      await AsyncStorage.setItem('healthshare_current_user', JSON.stringify(userWithoutPassword));
+
+      // Load profile data from the backend user object
+      useUserStore.getState().loadProfile(data.user);
 
       return {
         success: true,
@@ -69,33 +45,36 @@ class AuthStore {
         user: userWithoutPassword
       };
     } catch (error) {
-      return {
-        success: false,
-        message: 'Đã xảy ra lỗi khi đăng ký'
-      };
+      return { success: false, message: 'Lỗi mạng khi đăng ký' };
     }
   }
 
   // Đăng nhập
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
-      await this.loadUsers();
-      
-      const user = this.users.find(
-        u => u.email === credentials.email && u.password === credentials.password
-      );
+      const response = await fetch(`${API_URL}/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: credentials.email,
+          password: credentials.password,
+        }),
+      });
 
-      if (!user) {
-        return {
-          success: false,
-          message: 'Email hoặc mật khẩu không đúng'
-        };
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { success: false, message: data.message || 'Email hoặc mật khẩu không đúng' };
       }
 
-      // Lưu thông tin đăng nhập
-      const { password, ...userWithoutPassword } = user;
+      const { password, ...userWithoutPassword } = data.user;
       this.currentUser = userWithoutPassword;
       await AsyncStorage.setItem('healthshare_current_user', JSON.stringify(userWithoutPassword));
+
+      // Load profile data from the backend user object
+      useUserStore.getState().loadProfile(data.user);
 
       return {
         success: true,
@@ -103,10 +82,7 @@ class AuthStore {
         user: userWithoutPassword
       };
     } catch (error) {
-      return {
-        success: false,
-        message: 'Đã xảy ra lỗi khi đăng nhập'
-      };
+      return { success: false, message: 'Lỗi mạng khi đăng nhập' };
     }
   }
 
@@ -114,6 +90,9 @@ class AuthStore {
   async logout(): Promise<void> {
     this.currentUser = null;
     await AsyncStorage.removeItem('healthshare_current_user');
+    
+    // Clear local profile storage so next login/registration starts fresh
+    useUserStore.getState().clearProfile();
   }
 
   // Lấy user hiện tại

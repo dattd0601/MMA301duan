@@ -5,12 +5,12 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  SafeAreaView,
   TextInput,
   ScrollView,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Colors from "../../constants/colors";
-import { exercises, Exercise } from "../../mocks/exercises";
+import { Exercise } from "../../mocks/exercises";
 import ExerciseCard from "../../components/ExerciseCard";
 import { Search, Filter } from "lucide-react-native";
 import { useColorScheme } from "../../hooks/useColorScheme";
@@ -25,13 +25,27 @@ export default function ExerciseScreen() {
   const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
+  const [exerciseData, setExerciseData] = useState<Exercise[]>([]);
 
-  const filteredExercises = exercises.filter((exercise) => {
+  React.useEffect(() => {
+    fetch('http://192.168.3.250:5005/api/exercises')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setExerciseData(data);
+        } else {
+          console.error('API did not return an array:', data);
+        }
+      })
+      .catch(err => console.error(err));
+  }, []);
+
+  const filteredExercises = (Array.isArray(exerciseData) ? exerciseData : []).filter((exercise) => {
     const matchesSearch =
-      exercise.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      exercise.muscleGroups.some((group) =>
-        group.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      exercise?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (Array.isArray(exercise.muscleGroups) && exercise.muscleGroups.some((group) =>
+        group?.toLowerCase().includes(searchQuery.toLowerCase())
+      ));
 
     const matchesDifficulty = selectedDifficulty ? exercise.difficulty === selectedDifficulty : true;
 
@@ -157,7 +171,7 @@ export default function ExerciseScreen() {
       <FlatList
         data={filteredExercises}
         renderItem={renderExerciseItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item: Exercise) => item.id || (item as any)._id || Math.random().toString()}
         initialNumToRender={10}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
@@ -200,9 +214,11 @@ export default function ExerciseScreen() {
           
           {Array.isArray(selectedExercise.steps)
             ? selectedExercise.steps.map((step, idx) => (
-                <Text key={idx} style={{ color: colors.muted, marginTop: 8 }}>
-                  {step}
-                </Text>
+                <React.Fragment key={idx}>
+                  <Text style={{ color: colors.muted, marginTop: 8 }}>
+                    {step}
+                  </Text>
+                </React.Fragment>
               ))
             : null}
           <TouchableOpacity

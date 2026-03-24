@@ -3,17 +3,18 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   TouchableOpacity
 } from 'react-native';
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { LoginForm } from '../components/LoginForm';
 import { RegisterForm } from '../components/RegisterForm';
 import { authStore } from '../store/authStore';
-import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useUserStore } from '../store/userStore';
+import { useRouter } from 'expo-router';
 
 
 export default function AuthScreen() {
@@ -31,12 +32,13 @@ export default function AuthScreen() {
       const user = await authStore.checkAuthStatus();
       if (user) {
         setIsAuthenticated(true);
-        if (!profile) {
+        const hasCompletedOnboarding = useUserStore.getState().hasCompletedOnboarding;
+        
+        if (!hasCompletedOnboarding) {
           router.replace('/onboarding');
         } else {
           // router.replace('/(tabs)');
         }
-    
       }
     } catch (error) {
       console.error('Auth check error:', error);
@@ -46,10 +48,11 @@ export default function AuthScreen() {
   const handleAuthSuccess = async () => {
     setIsAuthenticated(true);
     
-  const profileString = await AsyncStorage.getItem('health-app-storage');
-  const profile = profileString ? JSON.parse(profileString) : null;
-    console.log('Profile:', profile);
-    if (!profile) {
+    // Give Zustand a tick to sync state if persist is slow, but getState is sync
+    const hasCompletedOnboarding = useUserStore.getState().hasCompletedOnboarding;
+    
+    
+    if (!hasCompletedOnboarding) {
       router.replace('/onboarding');
     } else {
       router.replace('/(tabs)');

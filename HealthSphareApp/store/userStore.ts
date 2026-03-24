@@ -18,6 +18,8 @@ interface UserState {
   resetWaterIntakeForNewDay: () => void;
   setHasCompletedOnboarding: (completed: boolean) => void;
   setPremium: (isPremium: boolean, expiryDate?: string) => void;
+  clearProfile: () => void;
+  loadProfile: (user: any) => void;
 }
 
 export const useUserStore = create<UserState>()(
@@ -175,6 +177,35 @@ export const useUserStore = create<UserState>()(
             premiumUntil: expiryDate,
           },
         }));
+      },
+      
+      clearProfile: () => {
+        set({
+          profile: null,
+          hasCompletedOnboarding: false,
+          waterIntakeToday: 0,
+          lastWaterReminder: null,
+        });
+      },
+
+      loadProfile: (user) => {
+        if (!user) return;
+        
+        set({
+          hasCompletedOnboarding: !!user.hasCompletedOnboarding,
+          profile: {
+            age: user.age,
+            gender: user.gender,
+            height: user.height,
+            weight: user.weight,
+            activityLevel: user.activityLevel,
+            goal: user.goal,
+            waterGoal: user.waterGoal,
+            waterIntake: user.waterIntake || [],
+            isPremium: !!user.isPremium,
+            premiumUntil: user.premiumUntil,
+          } as UserProfile
+        });
       },
     }),
     {

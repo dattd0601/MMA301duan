@@ -7,9 +7,9 @@ import {
   TouchableOpacity, 
   ScrollView,
   KeyboardAvoidingView,
-  Platform,
-  SafeAreaView
+  Platform
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
 import { useColorScheme } from "../hooks/useColorScheme";
@@ -17,6 +17,7 @@ import Colors from "../constants/colors";
 import { useUserStore } from "../store/userStore";
 import { activityLevels } from "../constants/activityLevels";
 import { ChevronRight } from "lucide-react-native";
+import { authStore } from "../store/authStore";
 
 export default function OnboardingScreen() {
   const colorScheme = useColorScheme();
@@ -52,7 +53,6 @@ export default function OnboardingScreen() {
     if (step < 4) {
       setStep(step + 1);
     } else {
-      // Save all data
       setProfile({
         height: parseFloat(height),
         weight: parseFloat(weight),
@@ -64,8 +64,30 @@ export default function OnboardingScreen() {
         waterGoal: Math.round(parseFloat(weight) * 0.03 * 1000), // in ml
         isPremium: false,
       });
-      
+
       setHasCompletedOnboarding(true);
+      
+      // Save to backend as well
+      const currentUser = authStore.getCurrentUser();
+      if (currentUser && (currentUser as any).id) {
+        const profileData = {
+          height: parseFloat(height),
+          weight: parseFloat(weight),
+          age: parseInt(age),
+          gender: gender as "male" | "female",
+          goal: goal as "gain" | "lose" | "maintain",
+          activityLevel: activityLevel as any,
+          waterGoal: Math.round(parseFloat(weight) * 0.03 * 1000),
+          hasCompletedOnboarding: true
+        };
+        
+        fetch(`http://192.168.3.250:5005/api/users/profile/${(currentUser as any).id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(profileData)
+        }).catch(err => console.error('Failed to sync profile to backend:', err));
+      }
+
       router.replace("/(tabs)");
     }
   };

@@ -5,16 +5,16 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  SafeAreaView,
   TextInput,
   ScrollView,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Search, Filter } from "lucide-react-native";
 
 import { useColorScheme } from "../../hooks/useColorScheme";
 import Colors from "../../constants/colors";
 import { useUserStore } from "../../store/userStore";
-import { vietnameseFoods, FoodItem } from "../../mocks/vietnameseFoods";
+import { FoodItem } from "../../mocks/vietnameseFoods";
 import FoodCard from "../../components/FoodCard";
 
 export default function FoodScreen() {
@@ -22,25 +22,39 @@ export default function FoodScreen() {
   const colors = Colors[colorScheme];
 
   const { calculateCalories, profile } = useUserStore();
-  const calories = calculateCalories();
+  const calories = calculateCalories() || { dailyCalories: 2000, proteinGrams: 0, carbsGrams: 0, fatGrams: 0 };
   const { dailyCalories, proteinGrams, carbsGrams, fatGrams } = calories;
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
   const [selectedFoods, setSelectedFoods] = useState<FoodItem[]>([]);
+  const [foodData, setFoodData] = useState<FoodItem[]>([]);
+
+  React.useEffect(() => {
+    fetch('http://192.168.3.250:5005/api/foods')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setFoodData(data);
+        } else {
+          console.error('API did not return an array:', data);
+        }
+      })
+      .catch(err => console.error(err));
+  }, []);
 
   const totalCalories = useMemo(() => {
     return selectedFoods.reduce((sum, f) => sum + f.calories, 0);
   }, [selectedFoods]);
 
   const filteredFoods = useMemo(() => {
-    return vietnameseFoods.filter((food) => {
+    return (Array.isArray(foodData) ? foodData : []).filter((food) => {
       const matchesSearch =
-        food.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        food.tags.some((tag) =>
-          tag.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+        food?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (Array.isArray(food.tags) && food.tags.some((tag) =>
+          tag?.toLowerCase().includes(searchQuery.toLowerCase())
+        ));
 
       const matchesCategory = selectedCategory
         ? food.category === selectedCategory
@@ -53,7 +67,7 @@ export default function FoodScreen() {
 
       return matchesSearch && matchesCategory && matchesGoal;
     });
-  }, [searchQuery, selectedCategory, selectedFilter]);
+  }, [foodData, searchQuery, selectedCategory, selectedFilter]);
 
   const categories = [
     { id: "breakfast", label: "Sáng" },
@@ -69,11 +83,8 @@ export default function FoodScreen() {
   ];
   
   const handleSelectFood = (food: FoodItem) => {
-    const isAlreadySelected = selectedFoods.some(f => f.id === food.id);
-    
-    if (isAlreadySelected) {
-      // Bỏ chọn món ăn
-      setSelectedFoods(selectedFoods.filter(f => f.id !== food.id));
+    if (selectedFoods.some(f => (f.id || (f as any)._id) === (food.id || (food as any)._id))) {
+      setSelectedFoods(selectedFoods.filter(f => (f.id || (f as any)._id) !== (food.id || (food as any)._id)));
     } else {
       // Thêm món ăn
       const newTotal = totalCalories + food.calories;
@@ -86,7 +97,7 @@ export default function FoodScreen() {
 
 
   const renderFoodItem = ({ item }: { item: FoodItem }) => {
-    const isSelected = selectedFoods.some(f => f.id === item.id);
+    const isSelected = selectedFoods.some(f => (f.id || (f as any)._id) === (item.id || (item as any)._id));
     return (
       <FoodCard 
         food={item} 
@@ -213,7 +224,7 @@ export default function FoodScreen() {
       <FlatList
         data={filteredFoods}
         renderItem={renderFoodItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item: FoodItem) => item.id || (item as any)._id || Math.random().toString()}
         numColumns={2}
         columnWrapperStyle={styles.foodGrid}
         contentContainerStyle={styles.listContent}
