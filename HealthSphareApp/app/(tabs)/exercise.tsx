@@ -28,7 +28,7 @@ export default function ExerciseScreen() {
   const [exerciseData, setExerciseData] = useState<Exercise[]>([]);
 
   React.useEffect(() => {
-    fetch('http://192.168.3.250:5005/api/exercises')
+    fetch('https://mma301duan.onrender.com/api/exercises')
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {

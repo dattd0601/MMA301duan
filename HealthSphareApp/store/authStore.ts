@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User, LoginCredentials, RegisterData, AuthResponse } from '../types/user';
 import { useUserStore } from './userStore';
 
-const API_URL = 'http://192.168.3.250:5005/api/users';
+const API_URL = 'https://mma301duan.onrender.com/api/users';
 
 class AuthStore {
   private currentUser: Omit<User, 'password'> | null = null;

@@ -81,7 +81,7 @@ export default function OnboardingScreen() {
           hasCompletedOnboarding: true
         };
         
-        fetch(`http://192.168.3.250:5005/api/users/profile/${(currentUser as any).id}`, {
+        fetch(`https://mma301duan.onrender.com/api/users/profile/${(currentUser as any).id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(profileData)

@@ -32,7 +32,7 @@ export default function FoodScreen() {
   const [foodData, setFoodData] = useState<FoodItem[]>([]);
 
   React.useEffect(() => {
-    fetch('http://192.168.3.250:5005/api/foods')
+    fetch('https://mma301duan.onrender.com/api/foods')
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
