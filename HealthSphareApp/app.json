@@ -35,7 +35,8 @@
         {
           "origin": "https://rork.app/"
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
@@ -45,7 +46,7 @@
         "origin": "https://rork.app/"
       },
       "eas": {
-        "projectId": "2d45f366-c197-482d-9c79-1d2a9316fc0e"
+        "projectId": "fffa04cf-3a65-4ab8-8630-ed04d842112a"
       }
     }
   }
