@@ -25,7 +25,17 @@ app.get('/', (req, res) => {
 
 // Database connection
 const PORT = process.env.PORT || 5005;
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/healthsphare';
+const MONGODB_URI = process.env.MONGODB_URI;
+
+console.log(`Attempting to start server on port: ${PORT}`);
+if (!MONGODB_URI) {
+  console.error('CRITICAL ERROR: MONGODB_URI is not defined in environment variables!');
+  process.exit(1);
+}
+
+// Masking URI for security in logs
+const maskedURI = MONGODB_URI.replace(/:([^@]+)@/, ':****@');
+console.log(`Connecting to MongoDB Atlas...`);
 
 mongoose.connect(MONGODB_URI)
   .then(() => {
@@ -35,5 +45,6 @@ mongoose.connect(MONGODB_URI)
     });
   })
   .catch((err) => {
-    console.error('MongoDB connection error:', err);
+    console.error('MongoDB connection error details:', err.message);
+    process.exit(1);
   });
